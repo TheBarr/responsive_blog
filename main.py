@@ -21,10 +21,11 @@ def get_contact():
 
 @app.route("/post/<int:id>")
 def get_post(id):
+    requested_post = None
     for post in posts_data:
         if post["id"] == id:
-            desired_post = post
-    return render_template("post.html", post=desired_post)
+            requested_post = post
+    return render_template("post.html", post=requested_post)
 
 
 
