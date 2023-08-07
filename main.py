@@ -1,5 +1,10 @@
 from flask import Flask, render_template, request
 import requests
+import smtplib
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 posts_data = requests.get("https://api.npoint.io/c790b4d5cab58020d391").json()
 app = Flask(__name__)
@@ -18,14 +23,18 @@ def get_about():
 @app.route("/contact", methods=["GET", "POST"])
 def get_contact():
     if request.method == 'POST':
-        name = request.form['name']
-        email = request.form['email']
-        phone = request.form['phone']
-        message = request.form['message']
-        print(name, email, phone, message)
-        return "<h1> Successfully sent your message."
+        with smtplib.SMTP("smtp.gmail.com") as conn:
+            conn.starttls()
+            conn.login(user=os.getenv("FROM_EMAIL"), password=os.getenv("PASSWORD"))
+            conn.sendmail(
+                from_addr=os.getenv("from_email"),
+                to_addrs=os.getenv("TO_EMAIL"),
+                msg=f"Subject: New Message\n\n Name: {request.form['name']}\n Email: {request.form['email']}\n "
+                    f"Phone: {request.form['phone']}\n Message: {request.form['message']}"
+            )
+        return render_template("contact.html", msg_sent=True)
     else:
-        return render_template("contact.html")
+        return render_template("contact.html", msg_sent=False)
 
 
 @app.route("/post/<int:id>")
