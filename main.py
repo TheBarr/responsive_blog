@@ -23,18 +23,23 @@ def get_about():
 @app.route("/contact", methods=["GET", "POST"])
 def get_contact():
     if request.method == 'POST':
-        with smtplib.SMTP("smtp.gmail.com") as conn:
-            conn.starttls()
-            conn.login(user=os.getenv("FROM_EMAIL"), password=os.getenv("PASSWORD"))
-            conn.sendmail(
-                from_addr=os.getenv("from_email"),
-                to_addrs=os.getenv("TO_EMAIL"),
-                msg=f"Subject: New Message\n\n Name: {request.form['name']}\n Email: {request.form['email']}\n "
-                    f"Phone: {request.form['phone']}\n Message: {request.form['message']}"
-            )
+        data = request.form
+        send_email(data['name'], data['email'], data['phone'], data['message'])
         return render_template("contact.html", msg_sent=True)
     else:
         return render_template("contact.html", msg_sent=False)
+
+
+def send_email(name, email, phone, message):
+    with smtplib.SMTP("smtp.gmail.com") as conn:
+        conn.starttls()
+        conn.login(user=os.getenv("FROM_EMAIL"), password=os.getenv("PASSWORD"))
+        conn.sendmail(
+            from_addr=os.getenv("from_email"),
+            to_addrs=os.getenv("TO_EMAIL"),
+            msg=f"Subject: New Message\n\n Name: {name}\n Email: {email}\n "
+                f"Phone: {phone}\n Message: {message}"
+        )
 
 
 @app.route("/post/<int:id>")
