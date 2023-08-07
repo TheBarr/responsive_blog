@@ -20,7 +20,7 @@
 
             {% for post in posts_data %}
             <div class="post-preview">
-                <a href="post.html">
+                <a href="{{ url_for('get_post', id=post.id) }}">
                     <h2 class="post-title">{{ post.title }}</h2>
                     <h3 class="post-subtitle">{{ post.subtitle }}</h3>
                 </a>
